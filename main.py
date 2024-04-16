@@ -6,7 +6,7 @@ import streamlit as st
 response = lch.generate_pet_name()
 
 
-st.title("Yanok.ai - Your Best Next Future")
+st.title("[Test] Yanok.ai - Your Best Next Future")
 text = st.header(response)
 st.text("")
 st.text("")
