@@ -1,12 +1,12 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-import os
-
+from openai import OpenAI
 from dotenv import load_dotenv
 
+clients = OpenAI()
+
 load_dotenv()
-OPEN_AI_API_KEY = os.environ['OPENAI_API_KEY']
 
 def generate_pet_name():
     prompt = ChatPromptTemplate.from_messages([
