@@ -30,7 +30,7 @@ def ask_question(question):
     ("user", "{input}")
     ])
 
-    llm = ChatOpenAI(temperature=0)
+    llm = ChatOpenAI(temperature=0, api_key= "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")
 
     output_parser = StrOutputParser()
 
