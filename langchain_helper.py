@@ -36,7 +36,7 @@ def ask_question(question):
 
     chain = prompt2 | llm | output_parser
 
-    name = chain.invoke({"input": question})
+    name = chain.invoke({"input": question+" Please list your sources."})
                
     return name
 
