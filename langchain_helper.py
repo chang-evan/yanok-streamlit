@@ -26,7 +26,7 @@ def generate_pet_name():
 
 def ask_question(question):
     prompt2 = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant"),
+    ("system", "You are a helpful assistant and you always list your sources"),
     ("user", "{input}")
     ])
 
