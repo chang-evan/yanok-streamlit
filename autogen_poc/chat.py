@@ -32,10 +32,11 @@ def resetchat():
 
 os.getenv("OPENAI_API_KEY")
 
-st.title("Yanok Language Training")
+st.subheader("Yanok Language Training")
+st.markdown(':rainbow[_Powered by GPT-4. Get ready to learn!_]')
 
 with st.sidebar:
-    st.header('Options')
+    st.header('Language Options')
     st.session_state.option = st.selectbox('Choose an option:', ["Ukrainian",'Chinese', 'Malay', 'French'], on_change=resetchat)
     option = st.session_state.option
     st.write(f"Classroom is operating in {option}")
