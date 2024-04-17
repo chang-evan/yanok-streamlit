@@ -2,8 +2,6 @@ from openai import OpenAI
 import streamlit as st
 import os
 
-os.getenv("OPENAI_API_KEY")
-
 
 def getupdatedprompt(prompt: str, robomessages: list):
     robomessages.append({"role": "user", "content": prompt})
@@ -23,7 +21,26 @@ def robo2robo(robomessages: list):
 )
     return roboprompt.choices[0].message.content
 
+def resetchat():
+    st.session_state.record = []
+    st.session_state.internalmessages = []
+    st.session_state.internalmessages.append({"role": "system", "content": f"You are a language teacher for {option}. Giving instructions in English, please print the top 3 nouns and verbs in {option} only and ask the user to translate. Do not provide the English translations. Based on the user's performance, switch to {option} if the user translates over 9/10 correctly."})
+    robomessages = []
+    robomessages.append({"role": "system", "content": "You analyze learning outcomes based on inputs from the student. The teacher will provide you with student inputs, and you maintain a list of vocabulary the student has not demonstrated fluency with, and share this back to the teacher as a structured list, with the instruction 'These are the terms the student may need to focus on:'."})
+
+
+
+os.getenv("OPENAI_API_KEY")
+
 st.title("Yanok Language Training")
+
+with st.sidebar:
+    st.header('Options')
+    st.session_state.option = st.selectbox('Choose an option:', ["Ukrainian",'Chinese', 'Malay', 'French'], on_change=resetchat)
+    option = st.session_state.option
+    st.write(f"Classroom is operating in {option}")
+    resetchat()
+
 
 client = OpenAI()
 
@@ -33,7 +50,8 @@ if "openai_model" not in st.session_state:
 if "record" not in st.session_state:
     st.session_state.record = []
     st.session_state.internalmessages = []
-    st.session_state.internalmessages.append({"role": "system", "content": "You are a language teacher for Chinese. Giving instructions in English, please print the top 3 nouns and verbs in Chinese only and (in English) ask the user to translate. Based on the user's performance, switch to Chinese if the user translates over 9/10 correctly."})
+    option = st.session_state.option
+    st.session_state.internalmessages.append({"role": "system", "content": f"You are a language teacher for {option}. Giving instructions in English, please print the top 3 nouns and verbs in {option} only and (in English) ask the user to translate. Based on the user's performance, switch to {option} if the user translates over 9/10 correctly."})
 
 robomessages = []
 robomessages.append({"role": "system", "content": "You analyze learning outcomes based on inputs from the student. The teacher will provide you with student inputs, and you maintain a list of vocabulary the student has not demonstrated fluency with, and share this back to the teacher as a structured list, with the instruction 'These are the terms the student may need to focus on:'."})
