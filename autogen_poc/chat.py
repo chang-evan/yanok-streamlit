@@ -5,12 +5,23 @@ import os
 os.getenv("OPENAI_API_KEY")
 
 
-def getupdatedprompt(prompt):
-    prompt = prompt
-
+def getupdatedprompt(prompt: str, robomessages: list):
+    robomessages.append({"role": "user", "content": prompt})
+    adjustmentsprompt = robo2robo(robomessages)
+    prompt = prompt + "Here is the vocabulary the student has not demonstrated fluency with: " + adjustmentsprompt
     return prompt
 
 
+def robo2robo(robomessages: list):
+    roboprompt = client.chat.completions.create(
+    model=st.session_state["openai_model"],
+    messages=[
+        {"role": m["role"], "content": m["content"]}
+        for m in robomessages
+    ],
+    stream=False,
+)
+    return roboprompt.choices[0].message.content
 
 st.title("Yanok Language Training")
 
@@ -22,7 +33,10 @@ if "openai_model" not in st.session_state:
 if "record" not in st.session_state:
     st.session_state.record = []
     st.session_state.internalmessages = []
-    st.session_state.internalmessages.append({"role": "system", "content": "You are a language teacher for Chinese. Giving instructions in English, please print the top 10 nouns and verbs in Chinese only and (in English) ask the user to translate. Based on the user's performance, switch to Chinese if the user translates over 9/10 correctly."})
+    st.session_state.internalmessages.append({"role": "system", "content": "You are a language teacher for Chinese. Giving instructions in English, please print the top 3 nouns and verbs in Chinese only and (in English) ask the user to translate. Based on the user's performance, switch to Chinese if the user translates over 9/10 correctly."})
+
+robomessages = []
+robomessages.append({"role": "system", "content": "You analyze learning outcomes based on inputs from the student. The teacher will provide you with student inputs, and you maintain a list of vocabulary the student has not demonstrated fluency with, and share this back to the teacher as a structured list, with the instruction 'These are the terms the student may need to focus on:'."})
 
 
 for message in st.session_state.record:
@@ -35,7 +49,7 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    revisedprompt = getupdatedprompt(prompt)    
+    revisedprompt = getupdatedprompt(prompt, robomessages)    
     st.session_state.internalmessages.append({"role": "user", "content": revisedprompt})
     
     with st.chat_message("assistant"):
