@@ -8,7 +8,7 @@ a = 1
 
 #load_dotenv()
 
-open_ai_key = os.getenv('OPEN_API_KEY')
+open_ai_key = os.getenv('OPENAI_API_KEY')
 
 def generate_pet_name():
     prompt = ChatPromptTemplate.from_messages([
