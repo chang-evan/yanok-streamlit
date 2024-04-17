@@ -6,7 +6,7 @@ os.getenv("OPENAI_API_KEY")
 
 
 def getupdatedprompt(prompt):
-    prompt = prompt + "------- Be a helpful code helper and execute code if requested"
+    prompt = prompt
 
     return prompt
 
@@ -22,6 +22,8 @@ if "openai_model" not in st.session_state:
 if "record" not in st.session_state:
     st.session_state.record = []
     st.session_state.internalmessages = []
+    st.session_state.internalmessages.append({"role": "system", "content": "You are a language teacher for Chinese. Giving instructions in English, please print the top 10 nouns and verbs in Chinese only and (in English) ask the user to translate. Based on the user's performance, switch to Chinese if the user translates over 9/10 correctly."})
+
 
 for message in st.session_state.record:
     with st.chat_message(message["role"]):
