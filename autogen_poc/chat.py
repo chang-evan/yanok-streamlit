@@ -6,7 +6,7 @@ import os
 def getupdatedprompt(prompt: str, robomessages: list):
     robomessages.append({"role": "user", "content": prompt})
     adjustmentsprompt = robo2robo(robomessages)
-    prompt = prompt + "Here is the vocabulary the student has not demonstrated fluency with: " + adjustmentsprompt
+    prompt = prompt + adjustmentsprompt + ". Summarize areas the student can improve and move on to the next exercise. Keep the exercises fun and light to maximize engagement."
     return prompt
 
 
@@ -24,24 +24,45 @@ def robo2robo(robomessages: list):
 def resetchat():
     st.session_state.record = []
     st.session_state.internalmessages = []
-    st.session_state.internalmessages.append({"role": "system", "content": f"You are a language teacher for {option}. Giving instructions in English, please print the top 3 nouns and verbs in {option} only and ask the user to translate. Do not provide the English translations. Based on the user's performance, switch to {option} if the user translates over 9/10 correctly."})
-    robomessages = []
-    robomessages.append({"role": "system", "content": "You analyze learning outcomes based on inputs from the student. The teacher will provide you with student inputs, and you maintain a list of vocabulary the student has not demonstrated fluency with, and share this back to the teacher as a structured list, with the instruction 'These are the terms the student may need to focus on:'."})
+    st.session_state.robomessages = []
 
 
 
-os.getenv("OPENAI_API_KEY")
 
-st.subheader("Yanok Language Training")
-st.markdown(':rainbow[_Powered by GPT-4. Get ready to learn!_]')
+
 
 with st.sidebar:
     st.header('Language Options')
     st.session_state.option = st.selectbox('Choose an option:', ["Ukrainian",'Chinese', 'Malay', 'French'], on_change=resetchat)
     option = st.session_state.option
     st.write(f"Classroom is operating in {option}")
-    resetchat()
 
+
+if "internalmessages" not in st.session_state:
+    st.session_state.internalmessages = []
+
+teacherprompt = f"""You are a language teacher for {option}, helpful and accomodating for the student's needs. You only engage with language learning topics. 
+You take input from an advisor who helps analyze the student's weaknesses. Kick off by asking the student for a baseline skill level. Then provide a few options for exercises in this session, including short reading exercises (e.g. paragraphs of text) or writing exercises (i.e. Short writing prompts) with edits and advice as needed - let the student choose but then quickly start the exercise."""
+
+st.session_state.internalmessages.append({"role": "system", "content": teacherprompt})
+
+#robomessages.append({"role": "system", "content": roboprompt})
+if "robomessages" not in st.session_state:
+    st.session_state.robomessages = []
+
+roboprompt = """You analyze learning outcomes based on inputs from the student. The teacher will provide you with student inputs,
+ and you maintain a list of vocabulary the student has not demonstrated fluency with, and share this back to the teacher as a structured list,
+ with the instruction 'These are the terms the student may need to focus on:'."""
+
+robomessages = st.session_state.robomessages
+robomessages.append({"role": "system", "content": roboprompt })
+
+
+
+
+
+
+os.getenv("OPENAI_API_KEY")
 
 client = OpenAI()
 
@@ -50,12 +71,23 @@ if "openai_model" not in st.session_state:
 
 if "record" not in st.session_state:
     st.session_state.record = []
-    st.session_state.internalmessages = []
-    option = st.session_state.option
-    st.session_state.internalmessages.append({"role": "system", "content": f"You are a language teacher for {option}. Giving instructions in English, please print the top 3 nouns and verbs in {option} only and (in English) ask the user to translate. Based on the user's performance, switch to {option} if the user translates over 9/10 correctly."})
 
-robomessages = []
-robomessages.append({"role": "system", "content": "You analyze learning outcomes based on inputs from the student. The teacher will provide you with student inputs, and you maintain a list of vocabulary the student has not demonstrated fluency with, and share this back to the teacher as a structured list, with the instruction 'These are the terms the student may need to focus on:'."})
+option = st.session_state.option
+st.session_state.internalmessages.append({"role": "system", "content": teacherprompt})
+
+
+
+
+st.subheader("Yanok Language Training")
+st.markdown(':rainbow[_Powered by GPT-4. Get ready to learn!_]')
+
+
+
+
+
+
+
+
 
 
 for message in st.session_state.record:
