@@ -67,7 +67,7 @@ os.getenv("OPENAI_API_KEY")
 client = OpenAI()
 
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-4-turbo-preview"
+    st.session_state["openai_model"] = "chatgpt-4o-latest"
 
 if "record" not in st.session_state:
     st.session_state.record = []
