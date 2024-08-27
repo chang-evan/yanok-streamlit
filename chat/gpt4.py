@@ -22,8 +22,8 @@ if "record" not in st.session_state:
 
 # Load FAISS index and associated question-answer data
 try:
-    index = faiss.read_index("wac_Qs_240815.index")
-    with open('wac_QAs_240815.pkl', 'rb') as file:
+    index = faiss.read_index("chat//wac_Qs_240815.index")
+    with open('chat//wac_QAs_240815.pkl', 'rb') as file:
         q = pickle.load(file)
         a = pickle.load(file)
         embeddings = pickle.load(file)
@@ -68,7 +68,18 @@ def get_context(userquery, index, q, a, k=5):
         return ""
 
 # Standard GPT response function
-def get_response(text, systemprompt="""You are a customer service expert for the organization "We Are Caring". Help customers with their questions by using the policies and information provided in the context to provide a response that is factual, helpful, and professional. Prioritize the information in the context while formulating a response. If the context does not provide sufficient background information to answer the user's question, advise the user to reach out to the team. Speak on behalf of the team using "we" pronouns instead of "I".""", GPT_MODEL="gpt-4-0125-preview"):
+def get_response(text, systemprompt=
+                 """
+                 You are a customer service expert for the organization "We Are Caring". 
+                 Help customers with their questions by using the policies and information provided in the context 
+                 to provide a response that is factual,focused, helpful, and professional. Prioritize the information in the 
+                 context while formulating a response. If the context does not provide sufficient background 
+                 information to answer the user's question, advise the user to reach out to the team. Speak on behalf 
+                 of the team using "we" pronouns instead of "I". Do not refer to the context or the information provided
+                 to the user but use the context information to form your answer where applicable or helpful. Do not incorporate the
+                 context information if not relevant to the specific query."
+                 """
+                 , GPT_MODEL="chatgpt-4o-latest"):
     try:
         response = client.chat.completions.create(
             messages=[
@@ -76,10 +87,12 @@ def get_response(text, systemprompt="""You are a customer service expert for the
                 {'role': 'user', 'content': text},
             ],
             model=GPT_MODEL,
-            temperature=0,
+            temperature=0
         )
+
         content = response.choices[0].message.content
         return content.strip()
+    
     except Exception as e:
         st.error(f"Error generating GPT-4 response: {e}")
         return "Sorry, there was an error processing your request."
