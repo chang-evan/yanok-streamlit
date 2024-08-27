@@ -1,1 +1,0 @@
-# Repo for proofs of concept using OpenAI API, Langchain, Autogen, and more
